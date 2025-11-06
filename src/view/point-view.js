@@ -1,50 +1,85 @@
 import { createElement } from '../render.js';
 
-function createSortTemplate() {
-  return `
-              <div class="event">
-                <time class="event__date" datetime="2019-03-18">MAR 18</time>
-                <div class="event__type">
-                  <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
-                </div>
-                <h3 class="event__title">Taxi Amsterdam</h3>
-                <div class="event__schedule">
-                  <p class="event__time">
-                    <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
-                    &mdash;
-                    <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
-                  </p>
-                  <p class="event__duration">30M</p>
-                </div>
-                <p class="event__price">
-                  &euro;&nbsp;<span class="event__price-value">20</span>
-                </p>
-                <h4 class="visually-hidden">Offers:</h4>
-                <ul class="event__selected-offers">
-                  <li class="event__offer">
-                    <span class="event__offer-title">Order Uber</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">20</span>
-                  </li>
-                </ul>
-                <button class="event__favorite-btn event__favorite-btn--active" type="button">
-                  <span class="visually-hidden">Add to favorite</span>
-                  <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-                    <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-                  </svg>
-                </button>
-                <button class="event__rollup-btn" type="button">
-                  <span class="visually-hidden">Open event</span>
-                </button>
-              </div>
-    `;
-}
-
 export default class PointView {
-  getTemplate() {
-    return createSortTemplate();
+  /**
+   * @param {Object} point - объект точки маршрута (из model/mock.js)
+   * @param {Array} destinations - массив пунктов назначения (model)
+   * @param {Array} options - массив всех опций (model)
+   */
+  constructor(point, destinations = [], options = []) {
+    this.point = point;
+    this.destinations = destinations;
+    this.options = options;
+    this.element = null;
   }
 
+  // Создаёт HTML-шаблон на основе данных.
+  getTemplate() {
+    // Находим связанный объект назначения по id.
+    // Если не найден — используем заглушку, чтобы шаблон не ломался.
+    const destination = this.destinations.find((d) => d.id === this.point.destinationId) || {
+      cityName: '',
+      description: '',
+      photos: [],
+    };
+
+    // Находим опции, которые применимы к этой точке (по id).
+    const pointOptions = this.options.filter(
+      (o) => this.point.optionIds && this.point.optionIds.includes(o.id)
+    );
+
+    // Простейшее форматирование дат — пока оставляем строковые значения.
+    const start = this.point.startDate || '';
+    const end = this.point.endDate || '';
+
+    return `
+      <div class="event">
+        <!-- Дата (показываем только дату в первой строке) -->
+        <time class="event__date" datetime="${start}">${start ? start.split('T')[0] : ''}</time>
+
+        <!-- Иконка типа события (при условии, что есть соответствующий файл в img/icons) -->
+        <div class="event__type">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${this.point.type}.png" alt="Event type icon">
+        </div>
+
+        <!-- Заголовок: тип + город -->
+        <h3 class="event__title">${this.point.type} ${destination.cityName}</h3>
+
+        <!-- Время начала и окончания -->
+        <div class="event__schedule">
+          <p class="event__time">
+            <time class="event__start-time" datetime="${start}">${start ? start.split('T')[1] : ''}</time>
+            &mdash;
+            <time class="event__end-time" datetime="${end}">${end ? end.split('T')[1] : ''}</time>
+          </p>
+        </div>
+
+        <!-- Цена -->
+        <p class="event__price">
+          &euro;&nbsp;<span class="event__price-value">${this.point.price}</span>
+        </p>
+
+        <!-- Список выбранных офферов -->
+        <h4 class="visually-hidden">Offers:</h4>
+        <ul class="event__selected-offers">
+          ${pointOptions.map((opt) => `
+              <li class="event__offer">
+                <span class="event__offer-title">${opt.name}</span>
+                &plus;&euro;&nbsp;
+                <span class="event__offer-price">${opt.price}</span>
+              </li>
+            `).join('')}
+        </ul>
+
+        <!-- Кнопка открытия редактирования -->
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>
+      </div>
+    `;
+  }
+
+  // Ленивое создание DOM-элемента — если ещё не создан, создаём через createElement.
   getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
@@ -52,7 +87,9 @@ export default class PointView {
     return this.element;
   }
 
+  // Сбрасываем ссылку на DOM — пригодится при перерисовке.
   removeElement() {
     this.element = null;
   }
 }
+
