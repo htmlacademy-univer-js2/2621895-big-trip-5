@@ -1,11 +1,11 @@
-import { createElement } from '../render.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-export default class FilterView {
+export default class FilterView extends AbstractStatefulView {
   constructor() {
-    this.element = null;
+    super();
   }
 
-  getTemplate() {
+  get template() {
     return `
       <form class="trip-filters" action="#" method="get">
         <div class="trip-filters__filter">
@@ -33,10 +33,12 @@ export default class FilterView {
     `;
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
+  /**
+   * Метод, который вызывается после updateElement()
+   * Нужно восстановить обработчики событий.
+   */
+  _restoreHandlers() {
+    // Здесь добавляй addEventListener(...) при необходимости.
+    // Метод обязателен в абстрактном stateful-view, оставлен пустым пока.
   }
 }
