@@ -92,7 +92,7 @@ export default class PointView extends AbstractStatefulView {
 
   /**
    * В stateful view обработчики восстанавливаются здесь
-   * (вызывается после updateElement())
+   * (вызывается после updateElement()) fdfddf
    */
   _restoreHandlers() {
     const rollupButton = this.element.querySelector('.event__rollup-btn');
