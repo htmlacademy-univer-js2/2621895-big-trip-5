@@ -43,13 +43,13 @@ export default class AbstractStatefulView extends AbstractView {
     const prevElement = this.element;
     const parent = prevElement.parentElement;
 
-    // Сбрасываем кэш элемента в компоненте
+    // Сбрасываем кэш элемента в компоненте gfgfgf
     this.removeElement();
 
     const newElement = this.element;
 
     if (!parent) {
-      // Нечего заменять — родитель не найден
+      // Нечего заменять — родитель не найден gfgffg
       return;
     }
 
