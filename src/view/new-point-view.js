@@ -1,20 +1,36 @@
-import { createElement } from '../render.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-export default class NewPointView {
+export default class NewPointView extends AbstractStatefulView {
   /**
    * @param {Array} destinations - список городов для datalist
    * @param {Array} options - список доступных опций
    */
   constructor(destinations = [], options = []) {
-    this.destinations = destinations;
-    this.options = options;
-    this.element = null;
+    super();
+    this._state = {
+      point: {
+        type: '',
+        destinationId: null,
+        startDate: '',
+        endDate: '',
+        price: 0,
+        optionIds: []
+      },
+      destinations,
+      options
+    };
+
+    // При необходимости можно вызвать this._restoreHandlers() здесь,
+    // но оставляем вызов вызывающему коду/рендереру (в данном проекте
+    // _restoreHandlers вызывается в конструкторе у тех view, которым нужно)
   }
 
-  getTemplate() {
+  get template() {
+    const destination = this._state.destinations;
+    const options = this._state.options;
     // В режиме создания поля пустые — но показываем список городов и офферов
-    const cityOptions = this.destinations.map((d) => `<option value="${d.cityName}"></option>`).join('');
-    const optionsTemplate = this.options.map((opt) => `
+    const cityOptions = destination.map((d) => `<option value="${d.cityName}"></option>`).join('');
+    const optionsTemplate = options.map((opt) => `
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden"
                id="event-offer-${opt.id}"
@@ -86,15 +102,11 @@ export default class NewPointView {
     `;
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  /**
+   * Метод, который вызывается после updateElement()
+   * Нужно восстановить обработчики событий.
+   */
+  _restoreHandlers() {
+    // Здесь добавляй addEventListener(...) при необходимости.
   }
 }
-

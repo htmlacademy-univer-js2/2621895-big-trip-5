@@ -26,7 +26,7 @@ export default class AbstractStatefulView extends AbstractView {
    * @abstract
    */
   _restoreHandlers() {
-    throw new Error('Abstract method not implemented: restoreHandlers');
+    throw new Error('Abstract method not implemented: _restoreHandlers');
   }
 
   /**
@@ -34,19 +34,28 @@ export default class AbstractStatefulView extends AbstractView {
    * @param {Object} update Объект с обновлённой частью состояния
    */
   _setState(update) {
-    this._state = structuredClone({...this._state, ...update});
+    // Создаём копию состояния, чтобы избежать мутаций
+    this._state = structuredClone({ ...this._state, ...update });
   }
 
   /** Метод для перерисовки элемента */
   #rerenderElement() {
     const prevElement = this.element;
     const parent = prevElement.parentElement;
+
+    // Сбрасываем кэш элемента в компоненте
     this.removeElement();
 
     const newElement = this.element;
 
+    if (!parent) {
+      // Нечего заменять — родитель не найден
+      return;
+    }
+
     parent.replaceChild(newElement, prevElement);
 
+    // Восстанавливаем обработчики на новом элементе
     this._restoreHandlers();
   }
 }
