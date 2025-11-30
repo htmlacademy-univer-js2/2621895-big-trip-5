@@ -45,6 +45,6 @@ export default class SortView extends AbstractStatefulView {
     return createSortTemplate();
   }
 
-  // Нет обработчиков — метод обязателен, но пустой
+  // Нет обработчиков — метод обязателен, но пустой ураа новая ветка
   _restoreHandlers() {}
 }
