@@ -15,9 +15,32 @@ const options = [
 ];
 
 const points = [
-  createPoint(1, 'flight', 3, '2025-10-21T12:25', '2025-10-21T13:35', 160, [1,2]),
+  createPoint(1, 'flight', 3, '2025-10-21T12:25', '2025-10-21T13:35', 160, [1, 2]),
   createPoint(2, 'bus', 2, '2025-10-22T09:00', '2025-10-22T10:00', 50, [5]),
   createPoint(3, 'train', 1, '2025-10-23T14:00', '2025-10-23T16:30', 120, [4]),
 ];
 
-export { destinations, options, points };
+// ✅ ГЕНЕРАТОР ФИЛЬТРОВ (ПО ТЗ)
+const generateFilters = (pointsCount) => ([
+  { type: 'everything', name: 'Everything', isChecked: true, isDisabled: pointsCount === 0 },
+  { type: 'future', name: 'Future', isChecked: false, isDisabled: pointsCount === 0 },
+  { type: 'present', name: 'Present', isChecked: false, isDisabled: true },
+  { type: 'past', name: 'Past', isChecked: false, isDisabled: true },
+]);
+
+// ✅ ГЕНЕРАТОР СОРТИРОВОК
+const generateSorts = () => ([
+  { type: 'day', name: 'Day', isChecked: true, isDisabled: false },
+  { type: 'event', name: 'Event', isChecked: false, isDisabled: true },
+  { type: 'time', name: 'Time', isChecked: false, isDisabled: false },
+  { type: 'price', name: 'Price', isChecked: false, isDisabled: false },
+  { type: 'offer', name: 'Offers', isChecked: false, isDisabled: true },
+]);
+
+export {
+  destinations,
+  options,
+  points,
+  generateFilters,
+  generateSorts
+};
